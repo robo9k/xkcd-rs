@@ -1,6 +1,6 @@
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    let comic_json: serde_json::Value = reqwest::Client::new()
+    let comic_json: xkcd::Comic = reqwest::Client::new()
         .get("https://xkcd.com/info.0.json")
         .send()
         .await?
