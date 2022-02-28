@@ -1,0 +1,6 @@
+[package]
+name = "xkcd"
+version = "0.1.0-alpha.0"
+edition = "2021"
+rust-version = "1.56.1"
+publish = false
