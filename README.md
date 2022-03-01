@@ -63,3 +63,15 @@ sqlite> .import comics.csv comics
 * https://xkcd.com/2288/info.0.json object ({"headerext...) is not valid in a csv row
 * https://xkcd.com/2445/info.0.json object ({"headerext...) is not valid in a csv row
 * https://xkcd.com/826/info.0.json object ({"pre":"\n<...) is not valid in a csv row
+
+```rust
+use url::Url;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let base = Url::parse("https://xkcd.com")?;
+    let url = base.join("//xkcd.com/1506/")?;
+    println!("{}", String::from(url));
+
+    Ok(())
+}
+```
