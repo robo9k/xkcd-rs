@@ -25,8 +25,41 @@ jq . comics.json > comics-pretty.json
 node download.js
 ```
 
+[schema.sql](schema.sql)
+[insert.sql](insert.sql)
 ```sh
 sqlite3 comics.db
 sqlite> .read schema.sql
 sqlite> .read insert.sql
 ```
+
+---
+
+```sh
+jq -r 'keys | @csv' db/xkcd-1.json && jq -r '[.alt,.day,.img,.link,.month,.news,.num,.safe_title,.title,.transcript,.year] | @csv' db/xkcd-*.json > comics.csv
+sqlite3 comics.db
+sqlite> .mode csv
+sqlite> .import comics.csv comics
+```
+[comics.csv](comics.csv)
+
+* https://xkcd.com/1005/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1037/info.0.json object ({"pre":"<no...) is not valid in a csv row
+* https://xkcd.com/1110/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1190/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1193/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1331/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/1335/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1350/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1416/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1446/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1506/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/1525/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/1608/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/1663/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/1975/info.0.json object ({"pre":"","...) is not valid in a csv row
+* https://xkcd.com/2067/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/2198/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/2288/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/2445/info.0.json object ({"headerext...) is not valid in a csv row
+* https://xkcd.com/826/info.0.json object ({"pre":"\n<...) is not valid in a csv row
