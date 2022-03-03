@@ -1,6 +1,12 @@
+use once_cell::sync::Lazy;
+use serde::de::Deserializer;
+use serde::{Deserialize, Serialize};
+use time::Date;
+use url::Url;
+
 pub type ComicNum = u64;
 
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct JsonComic {
     pub alt: String,
     pub day: String,
@@ -21,19 +27,79 @@ pub struct ComicNumber(pub ComicNum);
 #[derive(Debug)]
 pub struct Comic {
     number: ComicNumber,
-    image: url::Url,
-    publication: time::Date,
+    image: Url,
+    publication: Date,
     title: String,
     title_safe: String,
     alternate: String,
-    link: Option<url::Url>,
+    link: Option<Url>,
     transcript: String,
     news: String,
 }
 
-static BASE_URL: once_cell::sync::Lazy<url::Url> = once_cell::sync::Lazy::new(|| {
-    url::Url::parse("https://xkcd.com").expect("static URL to be parseable")
-});
+static BASE_URL: Lazy<Url> =
+    Lazy::new(|| Url::parse("https://xkcd.com").expect("static URL to be parseable"));
+
+impl<'de> Deserialize<'de> for Comic {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        use serde::de::{Error, Unexpected};
+
+        let json = JsonComic::deserialize(deserializer)?;
+
+        let number = ComicNumber(json.num);
+
+        let image = BASE_URL
+            .join(&json.img)
+            .map_err(|_| Error::invalid_value(Unexpected::Str(&json.img), &"a parseable URL"))?;
+
+        let year = json.year.parse::<i32>().map_err(|_| {
+            Error::invalid_value(Unexpected::Str(&json.year), &"a signed 32 bit integer")
+        })?;
+        let month = json
+            .month
+            .parse::<u8>()
+            .map_err(|_| {
+                Error::invalid_value(Unexpected::Str(&json.month), &"an usigned 8 bit integer")
+            })?
+            .try_into()
+            .map_err(|_| Error::invalid_value(Unexpected::Other(&json.month), &"a valid month"))?;
+        let day = json.day.parse::<u8>().map_err(|_| {
+            Error::invalid_value(Unexpected::Str(&json.day), &"an unsigned 8 bit integer")
+        })?;
+
+        let publication = Date::from_calendar_date(year, month, day).map_err(|_| {
+            Error::invalid_value(
+                Unexpected::Other(&json.img),
+                &"a valid date from year + month + day",
+            )
+        })?;
+
+        let link = if json.link.is_empty() {
+            None
+        } else {
+            let url = BASE_URL.join(&json.link).map_err(|_| {
+                Error::invalid_value(Unexpected::Str(&json.link), &"a parseable URL")
+            })?;
+
+            Some(url)
+        };
+
+        Ok(Comic {
+            number,
+            image,
+            publication,
+            title: json.title,
+            title_safe: json.safe_title,
+            alternate: json.alt,
+            link,
+            transcript: json.transcript,
+            news: json.news,
+        })
+    }
+}
 
 #[cfg(test)]
 mod tests {
