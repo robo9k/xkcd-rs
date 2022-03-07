@@ -26,7 +26,7 @@ pub struct ComicNumber(pub ComicNum);
 
 impl From<u64> for ComicNumber {
     fn from(value: u64) -> Self {
-        ComicNumber(value)
+        Self(value)
     }
 }
 
@@ -122,7 +122,7 @@ pub enum ComicId {
 
 impl From<u64> for ComicId {
     fn from(value: u64) -> Self {
-        ComicId::Number(value.into())
+        Self::Number(value.into())
     }
 }
 
