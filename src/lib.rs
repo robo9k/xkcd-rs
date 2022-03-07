@@ -1,3 +1,4 @@
+use http::{Request as HttpRequest, Uri};
 use once_cell::sync::Lazy;
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
@@ -109,7 +110,15 @@ impl<'de> Deserialize<'de> for Comic {
 
 impl From<ComicNumber> for Url {
     fn from(value: ComicNumber) -> Self {
-        Url::parse(&format!("https://xkcd.com/{}/info.0.json", value.0))
+        Self::parse(&format!("https://xkcd.com/{}/info.0.json", value.0))
+            .expect("typed URL to be parseable")
+    }
+}
+
+impl From<ComicNumber> for Uri {
+    fn from(value: ComicNumber) -> Self {
+        format!("https://xkcd.com/{}/info.0.json", value.0)
+            .try_into()
             .expect("typed URL to be parseable")
     }
 }
@@ -129,12 +138,34 @@ impl From<u64> for ComicId {
 static CURRENT_URL: Lazy<Url> =
     Lazy::new(|| Url::parse("https://xkcd.com/info.0.json").expect("static URL to be parseable"));
 
+static CURRENT_URI: Lazy<Uri> = Lazy::new(|| {
+    "https://xkcd.com/info.0.json"
+        .try_into()
+        .expect("static URL to be parseable")
+});
+
 impl From<ComicId> for Url {
     fn from(value: ComicId) -> Self {
         match value {
             ComicId::Current => CURRENT_URL.clone(),
             ComicId::Number(num) => num.into(),
         }
+    }
+}
+
+impl From<ComicId> for Uri {
+    fn from(value: ComicId) -> Self {
+        match value {
+            ComicId::Current => CURRENT_URI.clone(),
+            ComicId::Number(num) => num.into(),
+        }
+    }
+}
+
+impl From<ComicId> for HttpRequest<()> {
+    fn from(value: ComicId) -> Self {
+        let uri: Uri = value.into();
+        Self::get(uri).body(()).expect("HTTP request to be valid")
     }
 }
 

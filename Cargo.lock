@@ -1146,6 +1146,7 @@ dependencies = [
 name = "xkcd"
 version = "0.1.0-alpha.0"
 dependencies = [
+ "http",
  "once_cell",
  "reqwest",
  "serde",
