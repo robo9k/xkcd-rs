@@ -75,3 +75,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 ```
+
+```rust
+use http::Uri;
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let uri: Uri = "//xkcd.com/1506/".parse()?;
+    println!("{}", uri);
+
+    Ok(())
+}
+```
