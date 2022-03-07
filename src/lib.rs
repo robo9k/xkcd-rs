@@ -24,6 +24,12 @@ pub struct JsonComic {
 #[derive(Debug)]
 pub struct ComicNumber(pub ComicNum);
 
+impl From<u64> for ComicNumber {
+    fn from(value: u64) -> Self {
+        ComicNumber(value)
+    }
+}
+
 #[derive(Debug)]
 pub struct Comic {
     number: ComicNumber,
@@ -112,6 +118,12 @@ impl From<ComicNumber> for Url {
 pub enum ComicId {
     Current,
     Number(ComicNumber),
+}
+
+impl From<u64> for ComicId {
+    fn from(value: u64) -> Self {
+        ComicId::Number(value.into())
+    }
 }
 
 static CURRENT_URL: Lazy<Url> =
