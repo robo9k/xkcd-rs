@@ -101,6 +101,31 @@ impl<'de> Deserialize<'de> for Comic {
     }
 }
 
+impl From<ComicNumber> for Url {
+    fn from(value: ComicNumber) -> Self {
+        Url::parse(&format!("https://xkcd.com/{}/info.0.json", value.0))
+            .expect("typed URL to be parseable")
+    }
+}
+
+#[derive(Debug)]
+pub enum ComicId {
+    Current,
+    Number(ComicNumber),
+}
+
+static CURRENT_URL: Lazy<Url> =
+    Lazy::new(|| Url::parse("https://xkcd.com/info.0.json").expect("static URL to be parseable"));
+
+impl From<ComicId> for Url {
+    fn from(value: ComicId) -> Self {
+        match value {
+            ComicId::Current => CURRENT_URL.clone(),
+            ComicId::Number(num) => num.into(),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
