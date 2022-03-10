@@ -49,7 +49,7 @@ async fn main() -> anyhow::Result<()> {
     let mut conn = pool.acquire().await?;
 
     sqlx::query!(r#"
-INSERT INTO comics (number, image, publication, title, title_safe, alternate, link, transcript, news)
+INSERT OR REPLACE INTO comics (number, image, publication, title, title_safe, alternate, link, transcript, news)
 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);
     "#,
         comic_row.number,
