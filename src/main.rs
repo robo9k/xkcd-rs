@@ -1,14 +1,17 @@
-use hyper::Client;
-use hyper_tls::HttpsConnector;
-
 use bytes::BytesMut;
 use http::{Request, Response};
 use http_body::Body as _;
+use hyper::Client;
+use hyper_tls::HttpsConnector;
+use sqlx::sqlite::SqlitePool;
 use tower::{Service as _, ServiceBuilder, ServiceExt as _};
-use tower_http::BoxError;
 
 #[tokio::main]
-async fn main() -> Result<(), BoxError> {
+async fn main() -> anyhow::Result<()> {
+    let pool = SqlitePool::connect(&std::env::var("DATABASE_URL")?).await?;
+
+    sqlx::migrate!().run(&pool).await?;
+
     // Abstract TODOs for `tower-http`
     // - construct hyper client with TLS as default impl
     // - create tower client service fn (with decompression layer ?) from hyper client
