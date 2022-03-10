@@ -1,3 +1,13 @@
 {
-  "db": "SQLite"
+  "db": "SQLite",
+  "ab34277460483fedd4c39c38045a004d7faf18df01d57cf2939c6e1069f3cc21": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 9
+      }
+    },
+    "query": "\nINSERT INTO comics (number, image, publication, title, title_safe, alternate, link, transcript, news)\nVALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);\n    "
+  }
 }

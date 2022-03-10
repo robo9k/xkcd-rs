@@ -31,6 +31,12 @@ impl From<u64> for ComicNumber {
     }
 }
 
+impl From<ComicNumber> for u64 {
+    fn from(value: ComicNumber) -> Self {
+        value.0
+    }
+}
+
 #[derive(Debug)]
 pub struct Comic {
     number: ComicNumber,
@@ -168,6 +174,49 @@ impl From<ComicId> for HttpRequest<hyper::Body> {
         HttpRequest::get(uri)
             .body(hyper::Body::empty())
             .expect("HTTP request to be valid")
+    }
+}
+
+#[derive(Debug)]
+pub struct ComicRow {
+    pub number: u32,
+    pub image: String,
+    pub publication: String,
+    pub title: String,
+    pub title_safe: String,
+    pub alternate: String,
+    pub link: String,
+    pub transcript: String,
+    pub news: String,
+}
+
+const PUBLICATION_FORMAT_DESCRIPTION: &[time::format_description::FormatItem] =
+    time::macros::format_description!("[year]-[month]-[day]");
+
+impl From<Comic> for ComicRow {
+    fn from(value: Comic) -> Self {
+        let number: u64 = value.number.into();
+        let number = number.try_into().expect("comic number should fit into u32");
+        let image = value.image.into();
+        let publication = value
+            .publication
+            .format(PUBLICATION_FORMAT_DESCRIPTION)
+            .expect("date to be formattable");
+        let link = match value.link {
+            Some(link) => link.into(),
+            None => "".to_string(),
+        };
+        Self {
+            number,
+            image,
+            publication,
+            title: value.title,
+            title_safe: value.title_safe,
+            alternate: value.alternate,
+            link,
+            transcript: value.transcript,
+            news: value.news,
+        }
     }
 }
 

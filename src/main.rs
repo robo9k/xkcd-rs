@@ -22,7 +22,7 @@ async fn main() -> anyhow::Result<()> {
     // - check response `content-length` ?
     // - check response `content-type` ?
     // - convert response to BytesMut buffer or such
-    // - convert buffer to `xckd:Comic` via serde
+    // - convert buffer to `xkcd:Comic` via serde
 
     let https = HttpsConnector::new();
     let hyper_client = Client::builder().build::<_, _/*hyper::Body*/>(https);
@@ -41,8 +41,29 @@ async fn main() -> anyhow::Result<()> {
         bytes.extend_from_slice(&chunk[..]);
     }
 
-    let comic_json: xkcd::Comic = serde_json::from_slice(&bytes)?;
-    println!("{:#?}", comic_json);
+    let comic: xkcd::Comic = serde_json::from_slice(&bytes)?;
+    println!("{:#?}", comic);
+
+    let comic_row: xkcd::ComicRow = comic.into();
+
+    let mut conn = pool.acquire().await?;
+
+    sqlx::query!(r#"
+INSERT INTO comics (number, image, publication, title, title_safe, alternate, link, transcript, news)
+VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9);
+    "#,
+        comic_row.number,
+        comic_row.image,
+        comic_row.publication,
+        comic_row.title,
+        comic_row.title_safe,
+        comic_row.alternate,
+        comic_row.link,
+        comic_row.transcript,
+        comic_row.news,
+    )
+    .execute(&mut conn)
+    .await?;
 
     Ok(())
 }
