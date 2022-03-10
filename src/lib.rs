@@ -162,10 +162,12 @@ impl From<ComicId> for Uri {
     }
 }
 
-impl From<ComicId> for HttpRequest<()> {
+impl From<ComicId> for HttpRequest<hyper::Body> {
     fn from(value: ComicId) -> Self {
         let uri: Uri = value.into();
-        Self::get(uri).body(()).expect("HTTP request to be valid")
+        HttpRequest::get(uri)
+            .body(hyper::Body::empty())
+            .expect("HTTP request to be valid")
     }
 }
 
