@@ -8,4 +8,4 @@ CREATE TABLE comics (
     link        TEXT                NOT NULL,
     transcript  TEXT                NOT NULL,
     news        TEXT                NOT NULL
-);
+) STRICT;
