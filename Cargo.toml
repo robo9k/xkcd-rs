@@ -8,6 +8,7 @@ publish = false
 [dependencies]
 anyhow = "1.0.56"
 bytes = "1.1.0"
+clap = { version = "3.1.6", features = ["derive"] }
 http = "0.2.6"
 http-body = "0.4.4"
 hyper = { version = "0.14.17", features = ["client", "http1"] }

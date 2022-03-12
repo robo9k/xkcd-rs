@@ -22,7 +22,7 @@ pub struct JsonComic {
     pub year: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct ComicNumber(pub ComicNum);
 
 impl From<u64> for ComicNumber {
@@ -34,6 +34,14 @@ impl From<u64> for ComicNumber {
 impl From<ComicNumber> for u64 {
     fn from(value: ComicNumber) -> Self {
         value.0
+    }
+}
+
+impl std::str::FromStr for ComicNumber {
+    type Err = std::num::ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(u64::from_str(s)?))
     }
 }
 
@@ -129,14 +137,17 @@ impl From<ComicNumber> for Uri {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum ComicId {
     Current,
     Number(ComicNumber),
 }
 
-impl From<u64> for ComicId {
-    fn from(value: u64) -> Self {
+impl<T> From<T> for ComicId
+where
+    T: Into<ComicNumber>,
+{
+    fn from(value: T) -> Self {
         Self::Number(value.into())
     }
 }
